@@ -121,3 +121,32 @@ Suggested targets:
 
 - Frontend: Firebase Hosting
 - Backend: Render / Railway / Fly.io / any Node host
+
+### Backend on Railway
+
+The backend is prepared to run as a separate Railway service from the `backend` directory.
+
+Recommended Railway setup:
+
+1. Create a new Railway service from this repo.
+2. Set the service root directory to `backend`.
+3. Railway should use `backend/railway.json`:
+   - build command: `npm run build`
+   - start command: `npm run start`
+4. Add a persistent volume and mount it to `/data`.
+5. Set these environment variables:
+   - `CORS_ORIGIN=https://personalize-job.web.app,https://personalize-job.firebaseapp.com,http://localhost:5173`
+   - `DB_PATH=/data/jobs.db`
+
+Why this matters:
+
+- The app uses `node:sqlite`, so Node `22.x` is required. This is declared in `backend/package.json`.
+- SQLite should live on a persistent Railway volume. Without a volume, job data will be lost on redeploy/restart.
+- `PORT` is provided by Railway automatically.
+
+After Railway gives you a backend URL, update the frontend env before rebuilding/deploying Hosting:
+
+```bash
+VITE_API_BASE_URL=https://your-railway-backend.up.railway.app
+VITE_WS_BASE_URL=wss://your-railway-backend.up.railway.app
+```

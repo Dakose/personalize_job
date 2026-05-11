@@ -9,6 +9,9 @@ import { JobRepository } from './jobs/jobRepository.js'
 import { JobService } from './jobs/jobService.js'
 
 const port = Number(process.env.PORT ?? 3001)
+const allowedOrigins = process.env.CORS_ORIGIN?.split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
 const app = express()
 const server = createServer(app)
 const wss = new WebSocketServer({ server, path: '/ws' })
@@ -17,11 +20,27 @@ const repository = new JobRepository()
 const broadcaster = new JobBroadcaster()
 const jobService = new JobService(repository, broadcaster)
 
-app.use(cors())
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || !allowedOrigins || allowedOrigins.length === 0) {
+        callback(null, true)
+        return
+      }
+
+      callback(
+        allowedOrigins.includes(origin)
+          ? null
+          : new Error(`Origin ${origin} is not allowed by CORS`),
+        allowedOrigins.includes(origin),
+      )
+    },
+  }),
+)
 app.use(express.json())
 
 app.get('/health', (_request, response) => {
-  response.json({ ok: true })
+  response.json({ ok: true, service: 'backend' })
 })
 
 app.post('/jobs', (request, response) => {

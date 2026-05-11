@@ -1,0 +1,14 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "buildCommand": "npm run build",
+    "watchPatterns": [
+      "src/**",
+      "package.json",
+      "tsconfig.json"
+    ]
+  },
+  "deploy": {
+    "startCommand": "npm run start"
+  }
+}

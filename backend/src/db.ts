@@ -4,8 +4,9 @@ import { fileURLToPath } from 'node:url'
 import { DatabaseSync } from 'node:sqlite'
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url))
-const dataDir = path.resolve(currentDir, '../data')
-const databasePath = path.join(dataDir, 'jobs.db')
+const defaultDataDir = path.resolve(currentDir, '../data')
+const databasePath = process.env.DB_PATH?.trim() || path.join(defaultDataDir, 'jobs.db')
+const dataDir = path.dirname(databasePath)
 
 mkdirSync(dataDir, { recursive: true })
 
