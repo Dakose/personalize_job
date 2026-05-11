@@ -124,17 +124,22 @@ Suggested targets:
 
 ### Backend on Railway
 
-The backend is prepared to run as a separate Railway service from the `backend` directory.
+The backend is prepared for Railway in two ways:
+
+1. Preferred: set service root directory to `backend` and use `backend/railway.json`
+2. Alternative for plans/setups without root directory support: deploy from repo root and use the root `railway.json`
+
+If you deploy from repo root, Railway will use:
+
+- build command: `npm run build:backend`
+- start command: `npm run start:backend`
 
 Recommended Railway setup:
 
 1. Create a new Railway service from this repo.
-2. Set the service root directory to `backend`.
-3. Railway should use `backend/railway.json`:
-   - build command: `npm run build`
-   - start command: `npm run start`
-4. Add a persistent volume and mount it to `/data`.
-5. Set these environment variables:
+2. If available, set root directory to `backend`. If not, leave root at repo root and keep the root `railway.json`.
+3. Add a persistent volume and mount it to `/data`.
+4. Set these environment variables:
    - `CORS_ORIGIN=https://personalize-job.web.app,https://personalize-job.firebaseapp.com,http://localhost:5173`
    - `DB_PATH=/data/jobs.db`
 
