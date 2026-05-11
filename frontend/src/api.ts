@@ -2,13 +2,41 @@ import type { JobRecord } from './types'
 
 const DEFAULT_API_BASE_URL = 'http://localhost:3001'
 
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL?.trim() || DEFAULT_API_BASE_URL
-export const WS_BASE_URL =
-  import.meta.env.VITE_WS_BASE_URL?.trim() ||
-  API_BASE_URL.replace(/^http/i, (protocol: string) =>
-    protocol.toLowerCase() === 'https' ? 'wss' : 'ws',
-  )
+function normalizeHttpUrl(value: string | undefined, fallback: string) {
+  const trimmedValue = value?.trim()
+
+  if (!trimmedValue) {
+    return fallback
+  }
+
+  const withProtocol = /^https?:\/\//i.test(trimmedValue)
+    ? trimmedValue
+    : `https://${trimmedValue}`
+
+  return withProtocol.replace(/\/+$/, '')
+}
+
+function normalizeWsUrl(value: string | undefined, fallbackHttpUrl: string) {
+  const trimmedValue = value?.trim()
+
+  if (!trimmedValue) {
+    return fallbackHttpUrl.replace(/^http/i, (protocol: string) =>
+      protocol.toLowerCase() === 'https' ? 'wss' : 'ws',
+    )
+  }
+
+  const withProtocol = /^(wss?|https?):\/\//i.test(trimmedValue)
+    ? trimmedValue
+    : `wss://${trimmedValue}`
+
+  return withProtocol.replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://').replace(/\/+$/, '')
+}
+
+export const API_BASE_URL = normalizeHttpUrl(
+  import.meta.env.VITE_API_BASE_URL,
+  DEFAULT_API_BASE_URL,
+)
+export const WS_BASE_URL = normalizeWsUrl(import.meta.env.VITE_WS_BASE_URL, API_BASE_URL)
 
 interface JobResponse {
   job: JobRecord
