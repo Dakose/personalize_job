@@ -1,0 +1,16 @@
+{
+  "name": "fullstack-dev-test",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Fullstack job processing demo with React and Node",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev -w frontend",
+    "dev:backend": "npm run dev -w backend",
+    "build": "npm run build -w frontend && npm run build -w backend",
+    "lint": "npm run lint -w frontend"
+  }
+}
